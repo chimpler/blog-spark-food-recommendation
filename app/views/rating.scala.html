@@ -1,20 +1,26 @@
 @(item: model.Item)
 
 @main(item.title) {
+    <div class="jumbotron">
+        <h2 class="text-center">
+            <span>Your rating:</span>
+            <span class="label label-danger"><a href="rating?item=@item.itemId&rating=1">Very Bad</a></span>
+            <span class="label label-warning"><a href="rating?item=@item.itemId&rating=2">Bad</a></span>
+            <span class="label label-info"><a href="rating?item=@item.itemId&rating=3">Average</a></span>
+            <span class="label label-primary"><a href="rating?item=@item.itemId&rating=4">Good</a></span>
+            <span class="label label-success"><a href="rating?item=@item.itemId&rating=5">Excellent</a></span>
+        </h2>
+    </div>
+    <h3>@item.title</h3>
     <div class="row">
         <div class="col-md-3">
             <img src="@item.img"/>
         </div>
         <div class="col-md-7">
-        @Html(item.description)
+            @Html(item.description)
+            <br/>
+            <a href="@item.url">See item on Amazon</a>
         </div>
     </div>
-    <h5>
-        <span>Please rate this item:</span>
-        <span class="label label-danger"><a href="rating?item=@item.itemId&rating=1">Very Bad</a></span>
-        <span class="label label-warning"><a href="rating?item=@item.itemId&rating=2">Bad</a></span>
-        <span class="label label-info"><a href="rating?item=@item.itemId&rating=3">Average</a></span>
-        <span class="label label-primary"><a href="rating?item=@item.itemId&rating=4">Good</a></span>
-        <span class="label label-success"><a href="rating?item=@item.itemId&rating=5">Excellent</a></span>
-    </h5>
+
 }

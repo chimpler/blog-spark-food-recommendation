@@ -9,6 +9,6 @@ import scala.collection.JavaConversions._
 object Application extends Controller {
 
   def index = Action.async {
-    AmazonPageParser.parse("B001E4KFG0") map(item => Ok(views.html.rating(item)))
+    AmazonPageParser.parse("7800648702") map(item => Ok(views.html.rating(item)))
   }
 }

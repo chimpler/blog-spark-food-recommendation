@@ -17,7 +17,7 @@ object AmazonPageParser {
         val responseUrl = httpResponse.getUri.toString
         val nodeSelector = new NodeSelector(doc)
         val title = nodeSelector.select("span#productTitle").head.getTextContent
-        val img = nodeSelector.select("div#imgTagWrapperId img").head.getAttribute("src")
+        val img = nodeSelector.select("div#main-image-container img").head.getAttribute("src")
         val description = nodeSelector.select("div.productDescriptionWrapper").headOption.map(_.getHtml).mkString
 
         Item(itemId, title, responseUrl, img, description)
