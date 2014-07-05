@@ -1,7 +1,20 @@
 @(item: model.Item)
 
-@main("Rating") {
-    @item.title <br/>
-    <img src="@item.img"/> <br/>
-    @Html(item.description)
+@main(item.title) {
+    <div class="row">
+        <div class="col-md-3">
+            <img src="@item.img"/>
+        </div>
+        <div class="col-md-7">
+        @Html(item.description)
+        </div>
+    </div>
+    <h5>
+        <span>Please rate this item:</span>
+        <span class="label label-danger"><a href="rating?item=@item.itemId&rating=1">Very Bad</a></span>
+        <span class="label label-warning"><a href="rating?item=@item.itemId&rating=2">Bad</a></span>
+        <span class="label label-info"><a href="rating?item=@item.itemId&rating=3">Average</a></span>
+        <span class="label label-primary"><a href="rating?item=@item.itemId&rating=4">Good</a></span>
+        <span class="label label-success"><a href="rating?item=@item.itemId&rating=5">Excellent</a></span>
+    </h5>
 }

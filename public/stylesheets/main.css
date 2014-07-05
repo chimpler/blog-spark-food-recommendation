@@ -1,0 +1,25 @@
+body {
+    padding-top: 20px;
+    padding-bottom: 30px;
+}
+
+ul.rating {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.rating li {
+    float: left;
+}
+
+ul.rating a {
+    text-align: center;
+    display: block;
+    width: 20px;
+    margin: 5px;
+}
+
+.label a, .label a:hover {
+    color: white
+}
