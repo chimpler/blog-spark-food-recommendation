@@ -7,18 +7,24 @@ then
   gunzip finefoods.txt.gz
 fi
 
-if [ -f urls.txt.gz ]
-then
-  echo "You already have the full urls downloaded"
-  exit 0
-fi
+# Convert file using this format:
+# product/productId: B001E4KFG0
+# review/userId: A3SGXH7AUHU8GW
+# review/profileName: delmartian
+# review/helpfulness: 1/1
+# review/score: 5.0
+# review/time: 1303862400
+# review/summary: Good Quality Dog Food
+# review/text: I have bought several of the Vitality canned dog food products and have found them all to be of good quality. The product looks more like a stew than a processed meat and it smells better. My Labrador is finicky and she appreciates this product better than  most.
+#
+# to:
+#
+# productId userId score
+# B001E4KFG0 A3SGXH7AUHU8GW 5.0
 
-echo "Getting list of full URLs from Amazon. This can take a few hours..."
-grep productId finefoods.txt | sed -e 's/.* //' | sort | uniq > ids.txt
-
-while read id
+cat finefoods.txt | grep -e "product/productId\|review/userId\|review/score" | sed -e 's/.*: //' | while read line1
 do
-    curl -i http://www.amazon.com/dp/$id | grep Location: | sed -e 's/.* //' 2> /dev/null
-done < ids.txt > urls.txt
-
-gzip urls.txt
+  read line2
+  read line3
+  echo $line1,$line2,$line3
+done > ratings.csv

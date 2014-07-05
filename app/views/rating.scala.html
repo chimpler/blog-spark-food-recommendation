@@ -1,0 +1,7 @@
+@(item: model.Item)
+
+@main("Rating") {
+    @item.title <br/>
+    <img src="@item.img"/> <br/>
+    @Html(item.description)
+}
