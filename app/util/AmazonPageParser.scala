@@ -8,19 +8,24 @@ import scala.concurrent.Future
 
 object AmazonPageParser {
   def parse(itemId: String): Future[AmazonItem] = {
-    HttpClient.fetchUrl(s"http://www.amazon.com/dp/$itemId") map {
+    val url = s"http://www.amazon.com/dp/$itemId"
+    HttpClient.fetchUrl(url) map {
       httpResponse =>
-        val body = httpResponse.getResponseBody
-        val domBuilder = new LagartoDOMBuilder()
-        val doc = domBuilder.parse(body)
+        if (httpResponse.getStatusCode == 200) {
+          val body = httpResponse.getResponseBody
+          val domBuilder = new LagartoDOMBuilder()
+          val doc = domBuilder.parse(body)
 
-        val responseUrl = httpResponse.getUri.toString
-        val nodeSelector = new NodeSelector(doc)
-        val title = nodeSelector.select("span#productTitle").head.getTextContent
-        val img = nodeSelector.select("div#main-image-container img").head.getAttribute("src")
-        val description = nodeSelector.select("div.productDescriptionWrapper").headOption.map(_.getHtml).mkString
+          val responseUrl = httpResponse.getUri.toString
+          val nodeSelector = new NodeSelector(doc)
+          val title = nodeSelector.select("span#productTitle").head.getTextContent
+          val img = nodeSelector.select("div#main-image-container img").head.getAttribute("src")
+          val description = nodeSelector.select("div.productDescriptionWrapper").headOption.map(_.getHtml).mkString
 
-        AmazonItem(itemId, title, responseUrl, img, description)
+          AmazonItem(itemId, title, responseUrl, img, description)
+        } else {
+          throw new RuntimeException(s"Invalid url $url")
+        }
     }
   }
 }

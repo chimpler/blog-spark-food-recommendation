@@ -7,10 +7,12 @@ import util.{AmazonPageParser, Dictionary}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.Random
+import scala.util.{Success, Random}
 import model.{AmazonItem, AmazonRating}
 
 object Application extends Controller {
+  val NumRetries = 3
+
   val random = new Random()
 
   val sc = new SparkContext("local[4]", "recommender")
@@ -38,9 +40,21 @@ object Application extends Controller {
   // train the recommender
 //  ALS.train(sparkRatings, 2, 8)
 
-  def index = Action.async {
+  // return random amazon page and retry multiple times (in case a page is buggy, we try another one)
+  private def parseRandomAmazonPageWithRetries(numRetries: Int = NumRetries): Future[AmazonItem] = {
+    itemDict.getWord(random.nextInt(itemDict.size))
     val itemId = itemDict.getWord(random.nextInt(itemDict.size))
-    println(s"Item $itemId")
-    AmazonPageParser.parse(itemId) map (item => Ok(views.html.rating(item)))
+    AmazonPageParser.parse(itemId).recoverWith {
+      case e: Exception if numRetries >= 0 =>
+        parseRandomAmazonPageWithRetries(numRetries - 1)
+    }
+  }
+
+  def index = Action.async {
+    parseRandomAmazonPageWithRetries().map (
+      item => Ok(views.html.rating(item))
+    ) recover {
+      case e: Exception => sys.error(s"Cannot load Amazon page after $NumRetries attempts. Please reload the page")
+    }
   }
 }
