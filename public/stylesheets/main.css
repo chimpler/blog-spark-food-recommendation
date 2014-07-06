@@ -1,25 +1,15 @@
 body {
     padding-top: 70px;
-    padding-bottom: 30px;
-}
-
-ul.rating {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-ul.rating li {
-    float: left;
-}
-
-ul.rating a {
-    text-align: center;
-    display: block;
-    width: 20px;
-    margin: 5px;
 }
 
 .label a, .label a:hover {
     color: white
+}
+
+.footer {
+    text-align: center;
+    padding: 30px 0;
+    margin-top: 70px;
+    border-top: 1px solid #e5e5e5;
+    background-color: #f5f5f5;
 }

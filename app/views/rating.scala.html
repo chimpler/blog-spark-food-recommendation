@@ -1,4 +1,4 @@
-@(item: model.Item)
+@(item: model.AmazonItem)
 
 @main(item.title) {
     <div class="jumbotron">
@@ -13,13 +13,13 @@
     </div>
     <h3>@item.title</h3>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <img src="@item.img"/>
-        </div>
-        <div class="col-md-7">
-            @Html(item.description)
             <br/>
             <a href="@item.url">See item on Amazon</a>
+        </div>
+        <div class="col-md-6">
+            @Html(item.description)
         </div>
     </div>
 

@@ -13,8 +13,7 @@
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
     </head>
-    <body role="document">
-
+    <body data-spy="scroll" data-twttr-rendered="true">
             <!-- Fixed navbar -->
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container">
@@ -36,8 +35,12 @@
             </div>
         </div> <!-- /container -->
         <div class="container theme-showcase" role="main">
-            @content
+        @content
         </div>
-
+        <footer class="footer">
+            <div class="container">
+                <p>Designed and built with love somewhere on Earth</p>
+            </div>
+        </footer>
     </body>
 </html>

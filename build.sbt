@@ -2,6 +2,8 @@ name := "blog-spark-recommendation"
 
 version := "1.0-SNAPSHOT"
 
+scalaVersion := "2.10.4"
+
 val sparkVersion = "1.0.0"
 
 val akkaVersion = "2.2.3" // override Akka to be this version to match the one in Spark
@@ -11,7 +13,7 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   // HTTP client
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.0",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
   // HTML parser
   "org.jodd" % "jodd-lagarto" % "3.5.2",
   // Spark
