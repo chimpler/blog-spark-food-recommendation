@@ -1,0 +1,26 @@
+@(products: Seq[model.AmazonProduct])
+
+@main("Your Recommendations") {
+    <div class="jumbotron">
+        <h2 class="text-center">
+            <span>Your recommendations</span>
+        </h2>
+    </div>
+    @for(product <- products) {
+        <div class="jumbotron">
+            <h4 class="text-center">
+                <span>@product.title</span>
+            </h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="@product.img"/>
+                    <br/><br>
+                    <a href="@product.url">View on Amazon</a>
+                </div>
+                <div class="col-md-6">
+                    @Html(product.description)
+                </div>
+            </div>
+        </div>
+    }
+}

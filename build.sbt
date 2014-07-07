@@ -21,7 +21,9 @@ libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-mllib" % sparkVersion,
   // Akka
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-  "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
+  "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+  // MongoDB
+  "org.reactivemongo" %% "reactivemongo" % "0.10.0"
 )
 
 play.Project.playScalaSettings

@@ -1,14 +1,14 @@
 package util
 
 import jodd.lagarto.dom.{NodeSelector, LagartoDOMBuilder}
-import model.AmazonItem
+import model.AmazonProduct
 import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object AmazonPageParser {
-  def parse(itemId: String): Future[AmazonItem] = {
-    val url = s"http://www.amazon.com/dp/$itemId"
+  def parse(productId: String): Future[AmazonProduct] = {
+    val url = s"http://www.amazon.com/dp/$productId"
     HttpClient.fetchUrl(url) map {
       httpResponse =>
         if (httpResponse.getStatusCode == 200) {
@@ -22,7 +22,7 @@ object AmazonPageParser {
           val img = nodeSelector.select("div#main-image-container img").head.getAttribute("src")
           val description = nodeSelector.select("div.productDescriptionWrapper").headOption.map(_.getHtml).mkString
 
-          AmazonItem(itemId, title, responseUrl, img, description)
+          AmazonProduct(productId, title, responseUrl, img, description)
         } else {
           throw new RuntimeException(s"Invalid url $url")
         }

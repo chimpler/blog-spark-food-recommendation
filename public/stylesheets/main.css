@@ -2,10 +2,6 @@ body {
     padding-top: 70px;
 }
 
-.label a, .label a:hover {
-    color: white
-}
-
 .footer {
     text-align: center;
     padding: 30px 0;

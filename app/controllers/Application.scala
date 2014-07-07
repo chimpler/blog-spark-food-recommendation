@@ -1,60 +1,72 @@
 package controllers
 
+import model.AmazonRating._
+import model.{AmazonProduct, AmazonProductAndRating, AmazonRating}
 import org.apache.spark.SparkContext
-import org.apache.spark.mllib.recommendation.{ALS, Rating}
 import play.api.mvc._
-import util.{AmazonPageParser, Dictionary}
+import reactivemongo.api.MongoDriver
+import reactivemongo.api.collections.default.BSONCollection
+import reactivemongo.bson.BSONDocument
+import util.{AmazonPageParser, Recommender}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.util.{Success, Random}
-import model.{AmazonItem, AmazonRating}
 
 object Application extends Controller {
   val NumRetries = 3
+  val MaxRecommendations = 5
 
-  val random = new Random()
+  val driver = new MongoDriver
+  val connection = driver.connection(List("localhost"))
+
+  val db = connection("amazon_recommendation")
+  val ratingCollection = db[BSONCollection]("ratings")
 
   val sc = new SparkContext("local[4]", "recommender")
   sc.addJar("target/scala-2.10/blog-spark-recommendation_2.10-1.0-SNAPSHOT.jar")
-
-  // first create an RDD out of the rating file
-  lazy val ratings = sc.textFile("ratings.csv").map {
-    line =>
-      val Array(itemId, userId, scoreStr) = line.split(",")
-      AmazonRating(itemId, userId, scoreStr.toDouble)
-  }
-
-  // create user and item dictionaries
-  val userDict = new Dictionary(ratings.map(_.userId).distinct().collect)
-  val itemDict = new Dictionary(ratings.map(_.itemId).distinct().collect)
-
-  // convert to Spark Ratings using the dictionaries
-  val sparkRatings = ratings.map {
-    case AmazonRating(itemId, userId, score) =>
-      Rating(userDict.getIndex(userId),
-        itemDict.getIndex(itemId),
-        score)
-  }
-
-  // train the recommender
-//  ALS.train(sparkRatings, 2, 8)
+  val recommender = new Recommender(sc)
 
   // return random amazon page and retry multiple times (in case a page is buggy, we try another one)
-  private def parseRandomAmazonPageWithRetries(numRetries: Int = NumRetries): Future[AmazonItem] = {
-    itemDict.getWord(random.nextInt(itemDict.size))
-    val itemId = itemDict.getWord(random.nextInt(itemDict.size))
-    AmazonPageParser.parse(itemId).recoverWith {
+  private def parseRandomAmazonPageWithRetries(numRetries: Int): Future[AmazonProduct] = {
+    val productId = recommender.getRandomProductId
+    AmazonPageParser.parse(productId).recoverWith {
       case e: Exception if numRetries >= 0 =>
         parseRandomAmazonPageWithRetries(numRetries - 1)
     }
   }
 
-  def index = Action.async {
-    parseRandomAmazonPageWithRetries().map (
-      item => Ok(views.html.rating(item))
-    ) recover {
-      case e: Exception => sys.error(s"Cannot load Amazon page after $NumRetries attempts. Please reload the page")
+  def rating(productIdOpt: Option[String], ratingOpt: Option[Double]) = Action.async {
+    val fut = (productIdOpt, ratingOpt) match {
+      case (Some(productId), Some(rating)) =>
+        ratingCollection.save(AmazonRating("myself", productId, rating))
+
+      case _ => Future.successful()
+    }
+
+    fut.flatMap {
+      _ => parseRandomAmazonPageWithRetries(NumRetries).map(
+        item => Ok(views.html.rating(item))
+      ) recover {
+        case e: Exception => sys.error(s"Cannot load Amazon page after $NumRetries attempts. Please reload the page")
+      }
     }
   }
+
+  def index() = Action {
+    Redirect("/rating")
+  }
+
+  def recommendation = Action.async {
+    ratingCollection.find(BSONDocument.empty).cursor[AmazonRating].collect[Seq]().flatMap {
+      ratings =>
+        val amazonRatings = recommender.predict(ratings.take(MaxRecommendations)).toSeq
+        val productsFut = Future.traverse(amazonRatings) (
+          amazonRating => AmazonPageParser.parse(amazonRating.productId)
+        )
+        productsFut.map {
+          products => Ok(views.html.recommendation(products))
+        }
+    }
+  }
+
 }

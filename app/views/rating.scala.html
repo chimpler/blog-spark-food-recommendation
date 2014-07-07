@@ -1,14 +1,14 @@
-@(item: model.AmazonItem)
+@(item: model.AmazonProduct)
 
 @main(item.title) {
     <div class="jumbotron">
         <h2 class="text-center">
             <span>Your rating:</span>
-            <span class="label label-danger"><a href="rating?item=@item.itemId&rating=1">Very Bad</a></span>
-            <span class="label label-warning"><a href="rating?item=@item.itemId&rating=2">Bad</a></span>
-            <span class="label label-info"><a href="rating?item=@item.itemId&rating=3">Average</a></span>
-            <span class="label label-primary"><a href="rating?item=@item.itemId&rating=4">Good</a></span>
-            <span class="label label-success"><a href="rating?item=@item.itemId&rating=5">Excellent</a></span>
+            <button type="button" class="btn btn-lg btn-danger" onclick="location.href='/rating?item=@item.itemId&rating=1'">Very Bad</button>
+            <button type="button" class="btn btn-lg btn-warning" onclick="location.href='/rating?item=@item.itemId&rating=2'">Bad</button>
+            <button type="button" class="btn btn-lg btn-info" onclick="location.href='/rating?item=@item.itemId&rating=3'">Average</button>
+            <button type="button" class="btn btn-lg btn-primary" onclick="location.href='/rating?item=@item.itemId&rating=4'">Good</button>
+            <button type="button" class="btn btn-lg btn-success" onclick="location.href='/rating?item=@item.itemId&rating=5'">Excellent</button>
         </h2>
     </div>
     <h3>@item.title</h3>
@@ -19,7 +19,7 @@
             <a href="@item.url" target="_blank">See item on Amazon</a>
         </div>
         <div class="col-md-6">
-            @Html(item.description)
+        @Html(item.description)
         </div>
     </div>
 
