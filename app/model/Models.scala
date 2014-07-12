@@ -8,6 +8,7 @@ case class AmazonRating(userId: String, productId: String, rating: Double)
 
 case class AmazonProductAndRating(product: AmazonProduct, rating: AmazonRating)
 
+// For MongoDB
 object AmazonRating {
   implicit val amazonRatingHandler = Macros.handler[AmazonRating]
   implicit val amazonRatingFormat = Json.format[AmazonRating]

@@ -45,7 +45,7 @@ class Recommender(@transient sc: SparkContext) extends Serializable {
     // train model
     val myRatings = ratings.map(toSparkRating)
     val myRatingRDD = sc.parallelize(myRatings)
-    val model = ALS.train(sparkRatings ++ myRatingRDD, 5, 20)
+    val model = ALS.train(sparkRatings ++ myRatingRDD, 5, 20, 0.1)
 
     val myProducts = myRatings.map(_.product).toSet
     val candidates = sc.parallelize((0 until productDict.size).filter(!myProducts.contains(_)))
