@@ -64,13 +64,13 @@ object Application extends Controller {
         val amazonRatings = recommender.predict(ratings.take(MaxRecommendations)).toSeq
         val productsFut = Future.traverse(amazonRatings) (
           amazonRating => {
+            println("===========> " + amazonRating)
             // remove errored product pages
-            AmazonPageParser.parse(amazonRating.productId).map(Option(_)).recover { case _: Exception => None}
+            AmazonPageParser.parse(amazonRating.productId).map(Option(_)).recover {case _: Exception => None}
           }
         )
         productsFut.map {
-          products =>
-            Ok(views.html.recommendation(products.flatten))
+          products => Ok(views.html.recommendation(products.flatten))
         }
     }
   }
