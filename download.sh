@@ -19,12 +19,12 @@ fi
 #
 # to:
 #
-# productId userId score
-# B001E4KFG0 A3SGXH7AUHU8GW 5.0
+# userId productId score
+# A3SGXH7AUHU8GW,B001E4KFG0,5.0
 
 cat finefoods.txt | grep -e "product/productId\|review/userId\|review/score" | sed -e 's/.*: //' | while read line1
 do
   read line2
   read line3
   echo $line1,$line2,$line3
-done > ratings.csv
+done | awk -F, '{print $2","$1","$3}' | sort > ratings.csv

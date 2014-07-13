@@ -6,18 +6,22 @@ import org.apache.spark.mllib.recommendation.{ALS, Rating}
 
 import scala.util.Random
 
-class Recommender(@transient sc: SparkContext) extends Serializable {
+class Recommender(@transient sc: SparkContext, ratingFile: String) extends Serializable {
   val NumRecommendations = 10
+  val MinRecommendationsPerUser = 50
   val MyUserId = 0
 
   @transient val random = new Random() with Serializable
   // first create an RDD out of the rating file
 
-  val trainingRatings = sc.textFile("ratings.csv").map {
+  // parse ratings.csv and only keep users that have rated more than MinRecommendationsPerUser products
+  val trainingRatings = sc.textFile(ratingFile).map {
     line =>
-      val Array(itemId, userId, scoreStr) = line.split(",")
+      val Array(userId, itemId, scoreStr) = line.split(",")
       AmazonRating(userId, itemId, scoreStr.toDouble)
-  }
+  }.groupBy(_.userId).filter(_._2.size > MinRecommendationsPerUser).flatMap(_._2)
+
+  println(s"Parsed $ratingFile. Kept ${trainingRatings.count()} rows.")
 
   // create user and item dictionaries
   val userDict = new Dictionary("myself" +: trainingRatings.map(_.userId).distinct().collect)
@@ -51,6 +55,7 @@ class Recommender(@transient sc: SparkContext) extends Serializable {
     val candidates = sc.parallelize((0 until productDict.size).filter(!myProducts.contains(_)))
 
     // get all products not in my history
-    model.predict(candidates.map((MyUserId, _))).collect().sortBy(-_.rating).take(NumRecommendations).map(toAmazonRating)
+    val recommendations = model.predict(candidates.map((MyUserId, _))).collect()
+    recommendations.sortBy(-_.rating).take(NumRecommendations).map(toAmazonRating)
   }
 }
