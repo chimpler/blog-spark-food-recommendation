@@ -4,7 +4,7 @@ version := "1.0-SNAPSHOT"
 
 scalaVersion := "2.10.4"
 
-val sparkVersion = "1.0.0"
+val sparkVersion = "1.0.1"
 
 val akkaVersion = "2.2.3" // override Akka to be this version to match the one in Spark
 

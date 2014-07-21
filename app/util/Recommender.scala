@@ -11,6 +11,7 @@ class Recommender(@transient sc: SparkContext, ratingFile: String) extends Seria
   val MinRecommendationsPerUser = 10
   val MaxRecommendationsPerUser = 20
   val MyUsername = "myself"
+  val NumPartitions = 20
 
   @transient val random = new Random() with Serializable
   // first create an RDD out of the rating file
@@ -20,10 +21,11 @@ class Recommender(@transient sc: SparkContext, ratingFile: String) extends Seria
       AmazonRating(userId, productId, scoreStr.toDouble)
   }
 
-  // only keep users that have rated more than MinRecommendationsPerUser products
+  // only keep users that have rated between MinRecommendationsPerUser and MaxRecommendationsPerUser products
   val trainingRatings = rawTrainingRatings.groupBy(_.userId)
-                                          .filter(r => r._2.size > MinRecommendationsPerUser && r._2.size < MaxRecommendationsPerUser)
+                                          .filter(r => MinRecommendationsPerUser <= r._2.size  && r._2.size < MaxRecommendationsPerUser)
                                           .flatMap(_._2)
+                                          .repartition(NumPartitions)
                                           .cache()
 
   println(s"Parsed $ratingFile. Kept ${trainingRatings.count()} ratings out of ${rawTrainingRatings.count()}")
@@ -54,7 +56,7 @@ class Recommender(@transient sc: SparkContext, ratingFile: String) extends Seria
     // train model
     val myRatings = ratings.map(toSparkRating)
     val myRatingRDD = sc.parallelize(myRatings)
-    val model = ALS.train(sparkRatings ++ myRatingRDD, 10, 20)
+    val model = ALS.train((sparkRatings ++ myRatingRDD).repartition(NumPartitions), 10, 20, 0.01)
 
     val myProducts = myRatings.map(_.product).toSet
     val candidates = sc.parallelize((0 until productDict.size).filterNot(myProducts.contains))
