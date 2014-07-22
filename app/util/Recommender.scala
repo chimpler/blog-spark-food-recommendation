@@ -3,6 +3,7 @@ package util
 import model.AmazonRating
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.recommendation.{ALS, Rating}
+import org.joda.time.{Seconds, DateTime}
 
 import scala.util.Random
 
@@ -56,14 +57,21 @@ class Recommender(@transient sc: SparkContext, ratingFile: String) extends Seria
     // train model
     val myRatings = ratings.map(toSparkRating)
     val myRatingRDD = sc.parallelize(myRatings)
+
+    val startAls = DateTime.now
     val model = ALS.train((sparkRatings ++ myRatingRDD).repartition(NumPartitions), 10, 20, 0.01)
 
     val myProducts = myRatings.map(_.product).toSet
     val candidates = sc.parallelize((0 until productDict.size).filterNot(myProducts.contains))
 
-    // get all products not in my history ordered by rating (higher first)
+    // get ratings of all products not in my history ordered by rating (higher first) and only keep the first NumRecommendations
     val myUserId = userDict.getIndex(MyUsername)
-    val recommendations = model.predict(candidates.map((myUserId, _))).collect()
-    recommendations.sortBy(-_.rating).take(NumRecommendations).map(toAmazonRating)
+    val recommendations = model.predict(candidates.map((myUserId, _))).collect
+    val endAls = DateTime.now
+    val result = recommendations.sortBy(-_.rating).take(NumRecommendations).map(toAmazonRating)
+    val alsTime = Seconds.secondsBetween(startAls, endAls).getSeconds
+
+    println(s"ALS Time: $alsTime seconds")
+    result
   }
 }
