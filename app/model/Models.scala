@@ -13,3 +13,4 @@ object AmazonRating {
   implicit val amazonRatingHandler = Macros.handler[AmazonRating]
   implicit val amazonRatingFormat = Json.format[AmazonRating]
 }
+

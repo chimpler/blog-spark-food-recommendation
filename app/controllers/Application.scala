@@ -2,30 +2,31 @@ package controllers
 
 import model.AmazonRating._
 import model.{AmazonProduct, AmazonProductAndRating, AmazonRating}
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import play.api.mvc._
-import reactivemongo.api.MongoDriver
-import reactivemongo.api.collections.default.BSONCollection
+import reactivemongo.api.{DefaultDB, MongoDriver}
+import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.BSONDocument
 import util.{AmazonPageParser, Recommender}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object Application extends Controller {
+class Application extends Controller {
   val NumRetries = 3
   val MaxRecommendations = 5
 
   val driver = new MongoDriver
   val connection = driver.connection(List("localhost"))
 
-  val db = connection("amazon_recommendation")
+  val db: DefaultDB = connection("amazon_recommendation")
   val ratingCollection = db[BSONCollection]("ratings")
 
   val RatingFile = "ratings.csv"
 
-  val sc = new SparkContext("local[4]", "recommender")
-  sc.addJar("target/scala-2.10/blog-spark-recommendation_2.10-1.0-SNAPSHOT.jar")
+  val conf = new SparkConf().setAppName("recommender").setMaster("local[4]").set("spark.driver.allowMultipleContexts", "true")
+  val sc = new SparkContext(conf)
+  sc.addJar("target/scala-2.11/blog-spark-recommendation_2.11-1.0-SNAPSHOT.jar")
   val recommender = new Recommender(sc, RatingFile)
 
   // return random amazon page and retry multiple times (in case a page is buggy, we try another one)
@@ -40,8 +41,7 @@ object Application extends Controller {
   def rating(productIdOpt: Option[String], ratingOpt: Option[Double]) = Action.async {
     val fut = (productIdOpt, ratingOpt) match {
       case (Some(productId), Some(rating)) =>
-        ratingCollection.save(AmazonRating("myself", productId, rating))
-
+        ratingCollection.insert(AmazonRating("myself", productId, rating))
       case _ => Future.successful()
     }
 
