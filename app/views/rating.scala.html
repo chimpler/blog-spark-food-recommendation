@@ -3,13 +3,13 @@
 @main(item.title, "rating") {
     <div class="jumbotron">
         <h2 class="text-center">
-            <span>Your rating:</span>
-            <button type="button" class="btn btn-lg btn-danger" onclick="location.href='/rating?item=@item.itemId&rating=1'">Very Bad</button>
-            <button type="button" class="btn btn-lg btn-warning" onclick="location.href='/rating?item=@item.itemId&rating=2'">Bad</button>
-            <button type="button" class="btn btn-lg btn-info" onclick="location.href='/rating?item=@item.itemId&rating=3'">Average</button>
-            <button type="button" class="btn btn-lg btn-primary" onclick="location.href='/rating?item=@item.itemId&rating=4'">Good</button>
-            <button type="button" class="btn btn-lg btn-success" onclick="location.href='/rating?item=@item.itemId&rating=5'">Excellent</button>
-            or <a href="/rating">Skip</a>
+            <span>Your rating:</span><br>
+            <button type="button" class="btn btn-danger" onclick="location.href='/rating?item=@item.itemId&rating=1'">Very Bad</button>
+            <button type="button" class="btn  btn-warning" onclick="location.href='/rating?item=@item.itemId&rating=2'">Bad</button>
+            <button type="button" class="btn  btn-info" onclick="location.href='/rating?item=@item.itemId&rating=3'">Average</button>
+            <button type="button" class="btn  btn-primary" onclick="location.href='/rating?item=@item.itemId&rating=4'">Good</button>
+            <button type="button" class="btn  btn-success" onclick="location.href='/rating?item=@item.itemId&rating=5'">Excellent</button>
+            <br>or <a href="/rating">Skip</a>
         </h2>
     </div>
     <h3>@item.title</h3>

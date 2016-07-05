@@ -24,7 +24,7 @@ class Application extends Controller {
 
   val RatingFile = "ratings.csv"
 
-  val conf = new SparkConf().setAppName("recommender").setMaster("local[4]").set("spark.driver.allowMultipleContexts", "true")
+  val conf = new SparkConf().setAppName("recommender").setMaster("local[6]").set("spark.driver.allowMultipleContexts", "true")
   val sc = new SparkContext(conf)
   sc.addJar("target/scala-2.11/blog-spark-recommendation_2.11-1.0-SNAPSHOT.jar")
   val recommender = new Recommender(sc, RatingFile)
