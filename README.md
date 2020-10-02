@@ -1,7 +1,7 @@
 blog-spark-recommendation
 =========================
 
-Simple example on how to use recommenders in Spark / MLlib using the Play framework.
+There are the simple example on how to use recommenders in Spark / MLlib using the Play framework.
 More info on our blog: http://chimpler.wordpress.com/2014/07/22/building-a-food-recommendation-engine-with-spark-mllib-and-play/
 
 Setup
@@ -13,7 +13,7 @@ You will need:
 * Play Framework
 * MongoDB
 
-Download the food review file (500K reviews) using the `download.sh` script.
+ You can download the food review file (500K reviews) using the `download.sh` script.
 
 Running the example
 ===================
