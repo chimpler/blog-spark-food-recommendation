@@ -4,7 +4,7 @@ blog-spark-recommendation
 Simple example on how to use recommenders in Spark / MLlib using the Play framework.
 More info on our blog: http://chimpler.wordpress.com/2014/07/22/building-a-food-recommendation-engine-with-spark-mllib-and-play/
 
-Setup
+Setup....its very easy !!!
 =====
 
 You will need:
